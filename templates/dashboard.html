@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SoulMate{% endblock %}
+
+{% block content %}
+<section class="dashboard-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="profile-sidebar">
+                    <div class="profile-image">
+                        {% if user.profile and user.profile.profile_pic %}
+                            <img src="{{ url_for('static', filename='uploads/' + user.profile.profile_pic) }}" alt="Profile Picture" class="img-fluid rounded-circle">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Default Profile" class="img-fluid rounded-circle">
+                          }}" alt="Default Profile" class="img-fluid rounded-circle">
+                        {% endif %}
+                    </div>
+                    <h4 class="text-center mt-3">{{ user.username }}</h4>
+                    {% if user.profile %}
+                        <p class="text-center text-muted">{{ user.profile.location }}</p>
+                    {% endif %}
+                    <div class="profile-actions mt-3">
+                        {% if user.profile %}
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-primary btn-sm d-block mb-2">Edit Profile</a>
+                        {% else %}
+                            <a href="{{ url_for('create_profile') }}" class="btn btn-primary btn-sm d-block mb-2">Create Profile</a>
+                        {% endif %}
+                        <a href="{{ url_for('messages') }}" class="btn btn-outline-primary btn-sm d-block">
+                            Messages
+                            {% if unread_messages > 0 %}
+                                <span class="badge bg-danger">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+                <div class="dashboard-nav mt-4">
+                    <div class="list-group">
+                        <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action active">Dashboard</a>
+                        <a href="{{ url_for('search') }}" class="list-group-item list-group-item-action">Search Profiles</a>
+                        <a href="{{ url_for('messages') }}" class="list-group-item list-group-item-action">Messages</a>
+                        <a href="#" class="list-group-item list-group-item-action">Interests</a>
+                        <a href="#" class="list-group-item list-group-item-action">Settings</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="dashboard-content">
+                    <h2>Welcome, {{ user.username }}!</h2>
+                    
+                    {% if not user.profile %}
+                        <div class="alert alert-info">
+                            <h5>Complete Your Profile</h5>
+                            <p>Your profile is not yet complete. Create your profile to start finding matches!</p>
+                            <a href="{{ url_for('create_profile') }}" class="btn btn-primary">Create Profile</a>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>24</h3>
+                                    <p>Profile Views</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>12</h3>
+                                    <p>Interests Received</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>{{ unread_messages }}</h3>
+                                    <p>Unread Messages</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="matches-section mt-4">
+                        <h3>Your Matches</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="match-card">
+                                    <img src="{{ url_for('static', filename='images/profile1.jpg') }}" alt="Match" class="img-fluid">
+                                    <div class="match-info">
+                                        <h5>Priya S.</h5>
+                                        <p>28, Software Engineer</p>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">View Profile</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="match-card">
+                                    <img src="{{ url_for('static', filename='images/profile2.jpg') }}" alt="Match" class="img-fluid">
+                                    <div class="match-info">
+                                        <h5>Neha R.</h5>
+                                        <p>26, Doctor</p>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">View Profile</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="match-card">
+                                    <img src="{{ url_for('static', filename='images/profile3.webp') }}" alt="Match" class="img-fluid">
+                                    <div class="match-info">
+                                        <h5>Anjali M.</h5>
+                                        <p>27, Architect</p>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">View Profile</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('search') }}" class="btn btn-primary">Find More Matches</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

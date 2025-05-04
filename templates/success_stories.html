@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Success Stories - SoulMate{% endblock %}
+
+{% block content %}
+<section class="success-stories-hero py-5">
+    <div class="container text-center">
+        <h1 class="display-4">Success Stories</h1>
+        <p class="lead">Real couples who found true love on SoulMate</p>
+    </div>
+</section>
+
+<section class="success-stories-content py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='images/couple1.jpg') }}" alt="Rahul and Priya" class="img-fluid rounded">
+            </div>
+            <div class="col-md-6">
+                <div class="story-content">
+                    <h2>Rahul & Priya</h2>
+                    <p class="text-muted">Married June 2022</p>
+                    <p>We connected on SoulMate in January 2021. After chatting for a few weeks, we decided to meet for coffee. The connection was instant and we both knew this was something special.</p>
+                    <p>What we loved about SoulMate was how the matching algorithm really understood our values and preferences. We had so much in common from the start, which made our relationship flow naturally.</p>
+                    <p>After dating for a year, Rahul proposed during a sunset beach walk, and we got married in June 2022. We're so grateful to SoulMate for bringing us together!</p>
+                    <div class="story-quote">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"SoulMate didn't just help us find a partner - it helped us find our best friend and soulmate."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-6 order-md-2">
+                <img src="{{ url_for('static', filename='images/couple2.jpg') }}" alt="Arjun and Meera" class="img-fluid rounded">
+            </div>
+            <div class="col-md-6 order-md-1">
+                <div class="story-content">
+                    <h2>Arjun & Meera</h2>
+                    <p class="text-muted">Married March 2023</p>
+                    <p>Our story began when Arjun sent me an interest on SoulMate. I was initially hesitant about online matrimony, but his thoughtful first message caught my attention.</p>
+                    <p>We started talking and discovered we had the same values, goals, and even similar childhood memories. After a month of conversations, we met with our families, and everything just clicked.</p>
+                    <p>Six months later, we were engaged, and we got married in a beautiful ceremony surrounded by our loved ones. SoulMate's detailed profiles helped us find exactly what we were looking for in a partner.</p>
+                    <div class="story-quote">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"The compatibility matching on SoulMate is incredible. We're proof that the right algorithm can lead to true love!"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='images/couple3.jpg') }}" alt="Vikram and Nisha" class="img-fluid rounded">
+            </div>
+            <div class="col-md-6">
+                <div class="story-content">
+                    <h2>Vikram & Nisha</h2>
+                    <p class="text-muted">Engaged December 2022</p>
+                    <p>I had been on several matrimony sites without success when a friend recommended SoulMate. Within a week, I matched with Vikram, and we instantly connected over our shared love for travel and photography.</p>
+                    <p>After three months of video calls (we lived in different cities), Vikram flew to meet me and my family. It felt like we'd known each other for years. The detailed preferences on SoulMate really helped us find someone who matched our lifestyle and values.</p>
+                    <p>Vikram proposed during a surprise trip to the mountains, and we're getting married next month! We're so excited to start our life together.</p>
+                    <div class="story-quote">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"SoulMate helped us find each other despite living in different cities. Distance is no barrier when you've found your perfect match!"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="share-story text-center mt-5 py-4">
+            <h3>Found your soulmate on our platform?</h3>
+            <p>We'd love to hear your story and feature it on our website!</p>
+            <a href="#" class="btn btn-primary">Share Your Story</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-stories-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 60px 0;
+        border-radius: 0 0 50% 50% / 20px;
+    }
+    
+    .story-content {
+        padding: 20px;
+    }
+    
+    .story-content h2 {
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+    
+    .story-quote {
+        background-color: var(--light-pink);
+        border-left: 4px solid var(--primary-color);
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
+    
+    .story-quote i {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    .story-quote p {
+        font-style: italic;
+        margin-bottom: 0;
+    }
+    
+    .share-story {
+        background-color: var(--light-pink);
+        border-radius: var(--border-radius);
+        margin: 40px 0;
+    }
+</style>
+{% endblock %}

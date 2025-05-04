@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - SoulMate{% endblock %}
+
+{% block content %}
+<section class="about-hero py-5">
+    <div class="container text-center">
+        <h1 class="display-4">About SoulMate</h1>
+        <p class="lead">Bringing hearts together since 2020</p>
+    </div>
+</section>
+
+<section class="about-content py-5">
+    <div class="container">
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6">
+                <h2>Our Story</h2>
+                <p>SoulMate was founded with a simple yet powerful mission: to help people find meaningful, lasting relationships based on compatibility, shared values, and genuine connection.</p>
+                <p>Our founders, Amruth and Manojna, experienced firsthand the challenges of finding a compatible life partner through traditional means. After his own journey led him to his wife through a matrimonial service, he realized there was an opportunity to create something better - a platform that focuses not just on social and family criteria, but on true compatibility.</p>
+                <p>Since our launch in 2020, we've helped thousands of couples find their perfect match, leading to hundreds of successful marriages and countless love stories.</p>
+            </div>
+            <div class="col-md-6">
+                <img src="{{ url_for('static', filename='images/about-us.png') }}" alt="About SoulMate" class="img-fluid rounded">
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-12 text-center">
+                <h2>Our Mission</h2>
+                <p class="lead">To help individuals find their perfect life partner through a thoughtful, values-based matching approach.</p>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-4 mb-4">
+                <div class="value-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Authentic Connections</h3>
+                    <p>We believe in fostering genuine relationships based on compatibility and shared values, not just surface-level attributes.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Safety & Privacy</h3>
+                    <p>We prioritize the security of our users with strict verification processes and privacy controls.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Inclusivity</h3>
+                    <p>We welcome people from all backgrounds, cultures, and communities, creating a diverse and inclusive platform.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6 order-md-2">
+                <h2>Our Approach</h2>
+                <p>At SoulMate, we take a different approach to matchmaking:</p>
+                <ul>
+                    <li><strong>Compatibility-Focused:</strong> Our algorithm goes beyond basic demographics to match people based on personality, values, and life goals.</li>
+                    <li><strong>Quality Over Quantity:</strong> We believe in presenting fewer, more compatible matches rather than overwhelming users with options.</li>
+                    <li><strong>Verified Profiles:</strong> Every profile undergoes a verification process to ensure authenticity and build trust.</li>
+                    <li><strong>User Privacy:</strong> We give users control over who can view their profile and how much information they share.</li>
+                    <li><strong>Continuous Improvement:</strong> We regularly update our matching algorithm based on successful matches and user feedback.</li>
+                </ul>
+            </div>
+            <div class="col-md-6 order-md-1">
+                <img src="{{ url_for('static', filename='images/our-approach.png') }}" alt="Our Approach" class="img-fluid rounded">
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div class="stats-section text-center py-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h3>50,000+</h3>
+                                <p>Registered Users</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h3>5,000+</h3>
+                                <p>Successful Matches</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <h3>1,000+</h3>
+                                <p>Marriages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2>Meet Our Team</h2>
+                <p class="mb-5">The passionate individuals behind SoulMate</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="team-card">
+                    <img src="{{ url_for('static', filename='images/team1.jpeg') }}" alt="Amruth Gowda" class="img-fluid rounded-circle">
+                    <h4>Amruth Gowda</h4>
+                    <p class="text-muted">Founder</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="team-card">
+                    <img src="{{ url_for('static', filename='images/team2.jpeg') }}" alt="Manojna" class="img-fluid rounded-circle">
+                    <h4>Manojna</h4>
+                    <p class="text-muted">Co-Founder</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="team-card">
+                    <img src="{{ url_for('static', filename='images/team3.png') }}" alt="Monish" class="img-fluid rounded-circle">
+                    <h4>Monish</h4>
+                    <p class="text-muted">CEO</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="team-card">
+                    <img src="{{ url_for('static', filename='images/team4.jpeg') }}" alt="Abhijay" class="img-fluid rounded-circle">
+                    <h4>Abhijay</h4>
+                    <p class="text-muted">CTO</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 60px 0;
+        border-radius: 0 0 50% 50% / 20px;
+    }
+    
+    .value-card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 30px;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .value-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .value-card .icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    
+    .value-card .icon-wrapper i {
+        font-size: 30px;
+        color: white;
+    }
+    
+    .stats-section {
+        background-color: var(--light-pink);
+        border-radius: var(--border-radius);
+    }
+    
+    .stat-item h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+    
+    .team-card {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .team-card img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        margin: 0 auto 20px;
+        border: 5px solid var(--light-pink);
+    }
+    
+    .team-card h4 {
+        margin-bottom: 5px;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}

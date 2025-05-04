@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - SoulMate{% endblock %}
+
+{% block content %}
+<section class="messages-section py-5">
+    <div class="container">
+        <h2 class="mb-4">Messages</h2>
+        
+        <div class="message-tabs">
+            <ul class="nav nav-tabs" id="messageTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="inbox-tab" data-bs-toggle="tab" data-bs-target="#inbox" type="button" role="tab" aria-controls="inbox" aria-selected="true">
+                        Inbox ({{ received|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab" aria-controls="sent" aria-selected="false">
+                        Sent ({{ sent|length }})
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content p-3" id="messageTabContent">
+                <div class="tab-pane fade show active" id="inbox" role="tabpanel" aria-labelledby="inbox-tab">
+                    {% if received %}
+                        {% for message in received %}
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">
+                                        {{ message.sender.username }}
+                                    </div>
+                                    <div class="message-time">
+                                        {{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}
+                                    </div>
+                                </div>
+                                <div class="message-content">
+                                    {{ message.content }}
+                                </div>
+                                <div class="message-actions">
+                                    <a href="{{ url_for('send_message', recipient_id=message.sender_id) }}" class="text-primary">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </a>
+                                    <a href="{{ url_for('view_profile', user_id=message.sender_id) }}" class="text-secondary">
+                                        <i class="fas fa-user"></i> View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x mb-3" style="color: var(--primary-color);"></i>
+                            <h4>Your inbox is empty</h4>
+                            <p>When someone sends you a message, it will appear here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                    {% if sent %}
+                        {% for message in sent %}
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <div class="message-sender">
+                                        To: {{ message.recipient.username }}
+                                    </div>
+                                    <div class="message-time">
+                                        {{ message.timestamp.strftime('%b %d, %Y at %I:%M %p') }}
+                                    </div>
+                                </div>
+                                <div class="message-content">
+                                    {{ message.content }}
+                                </div>
+                                <div class="message-actions">
+                                    <a href="{{ url_for('send_message', recipient_id=message.recipient_id) }}" class="text-primary">
+                                        <i class="fas fa-paper-plane"></i> Send Another
+                                    </a>
+                                    <a href="{{ url_for('view_profile', user_id=message.recipient_id) }}" class="text-secondary">
+                                        <i class="fas fa-user"></i> View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-paper-plane fa-3x mb-3" style="color: var(--primary-color);"></i>
+                            <h4>You haven't sent any messages yet</h4>
+                            <p>Start connecting with potential matches by sending them a message.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

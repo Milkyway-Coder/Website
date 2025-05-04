@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - SoulMate{% endblock %}
+
+{% block content %}
+<section class="edit-profile-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Edit Your Profile</h2>
+        <form method="POST" enctype="multipart/form-data" class="card shadow-lg p-4">
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="profile-pic-preview mb-3">
+                        {% if profile.profile_pic %}
+                            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" alt="Profile Picture" class="img-fluid rounded-circle" width="150">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Default" class="img-fluid rounded-circle" width="150">
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile_pic" class="form-label">Change Profile Picture</label>
+                        <input class="form-control" type="file" name="profile_pic">
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" value="{{ profile.full_name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select name="gender" class="form-select">
+                                <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dob" class="form-label">Date of Birth</label>
+                            <input type="date" name="dob" class="form-control" value="{{ profile.dob.strftime('%Y-%m-%d') if profile.dob }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" step="0.1" name="height" class="form-control" value="{{ profile.height }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="religion" class="form-label">Religion</label>
+                            <input type="text" name="religion" class="form-control" value="{{ profile.religion }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="caste" class="form-label">Caste</label>
+                            <input type="text" name="caste" class="form-control" value="{{ profile.caste }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="education" class="form-label">Education</label>
+                            <input type="text" name="education" class="form-control" value="{{ profile.education }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profession" class="form-label">Profession</label>
+                            <input type="text" name="profession" class="form-control" value="{{ profile.profession }}">
+                        </div>
+                        <div class="col-12">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" value="{{ profile.location }}">
+                        </div>
+                        <div class="col-12">
+                            <label for="about" class="form-label">About Me</label>
+                            <textarea name="about" rows="3" class="form-control">{{ profile.about }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="interests" class="form-label">Interests & Hobbies</label>
+                            <textarea name="interests" rows="2" class="form-control">{{ profile.interests }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="partner_preferences" class="form-label">Partner Preferences</label>
+                            <textarea name="partner_preferences" rows="2" class="form-control">{{ profile.partner_preferences }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <button type="submit" class="btn btn-success px-5">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

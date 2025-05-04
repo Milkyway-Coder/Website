@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Profiles - SoulMate{% endblock %}
+
+{% block content %}
+<section class="search-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Find Your Perfect Match</h2>
+        
+        <div class="search-filters">
+            <form method="POST" action="{{ url_for('search') }}">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="gender" class="form-label">Looking for</label>
+                        <select class="form-select" id="gender" name="gender">
+                            <option value="">Any Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="min_age" class="form-label">Min Age</label>
+                        <select class="form-select" id="min_age" name="min_age">
+                            {% for age in range(18, 61) %}
+                                <option value="{{ age }}" {% if age == 18 %}selected{% endif %}>{{ age }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="max_age" class="form-label">Max Age</label>
+                        <select class="form-select" id="max_age" name="max_age">
+                            {% for age in range(18, 61) %}
+                                <option value="{{ age }}" {% if age == 40 %}selected{% endif %}>{{ age }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="religion" class="form-label">Religion</label>
+                        <select class="form-select" id="religion" name="religion">
+                            <option value="">Any Religion</option>
+                            <option value="Hindu">Hindu</option>
+                            <option value="Muslim">Muslim</option>
+                            <option value="Christian">Christian</option>
+                            <option value="Sikh">Sikh</option>
+                            <option value="Buddhist">Buddhist</option>
+                            <option value="Jain">Jain</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        {% if profiles %}
+            <div class="profile-grid">
+                {% for profile in profiles %}
+                    <div class="profile-card-search">
+                        {% if profile.profile_pic %}
+                            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" alt="{{ profile.full_name }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Default Profile">
+                        {% endif %}
+                        <div class="profile-card-info">
+                            <h4>{{ profile.full_name }}</h4>
+                            <div class="profile-meta">
+                                <span>{{ ((now - profile.dob).days / 365)|int }} years</span>
+                                <span>{{ profile.location }}</span>
+                            </div>
+                            <p>{{ profile.profession }}</p>
+                            <div class="d-grid">
+                                <a href="{{ url_for('view_profile', user_id=profile.user_id) }}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if request.method == 'POST' %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3" style="color: var(--primary-color);"></i>
+                    <h3>No profiles match your search criteria</h3>
+                    <p>Try adjusting your search filters to find more matches.</p>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-heart fa-3x mb-3" style="color: var(--primary-color);"></i>
+                    <h3>Find Your Perfect Match</h3>
+                    <p>Use the search filters above to discover compatible profiles.</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const minAgeSelect = document.getElementById('min_age');
+        const maxAgeSelect = document.getElementById('max_age');
+        
+        minAgeSelect.addEventListener('change', function() {
+            const minAge = parseInt(this.value);
+            
+            // Update max age options
+            for (let i = 0; i < maxAgeSelect.options.length; i++) {
+                const option = maxAgeSelect.options[i];
+                const age = parseInt(option.value);
+                
+                if (age < minAge) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            }
+            
+            // If current max age is less than min age, update it
+            if (parseInt(maxAgeSelect.value) < minAge) {
+                maxAgeSelect.value = minAge;
+            }
+        });
+    });
+</script>
+{% endblock %}

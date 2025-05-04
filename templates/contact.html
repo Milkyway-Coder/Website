@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - SoulMate{% endblock %}
+
+{% block content %}
+<section class="contact-hero py-5">
+    <div class="container text-center">
+        <h1 class="display-4">Contact Us</h1>
+        <p class="lead">We'd love to hear from you</p>
+    </div>
+</section>
+
+<section class="contact-content py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="contact-info">
+                    <h2>Get in Touch</h2>
+                    <p>Have questions, feedback, or need assistance? Our team is here to help!</p>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h5>Our Office</h5>
+                            <p>10th floor, SkyTower<br>Chickballapur, Karnataka<br>India</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h5>Phone</h5>
+                            <p>+91 9591956238 (Amruth)<br>+91 9482291893 (Monish)<br>+91 9820847062 (Abhijay)<br>+91 8217355768 (Manojna)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h5>Email</h5>
+                            <p>support@soulmate.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h5>Working Hours</h5>
+                            <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 2:00 PM<br>Sunday: Closed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links mt-4">
+                        <h5>Connect With Us</h5>
+                        <div class="social-icons">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="contact-form">
+                    <h2>Send Us a Message</h2>
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="map-container">
+                    <h2 class="text-center mb-4">Find Us</h2>
+                    <div class="map">
+                        <!-- Replace with an actual map embed code -->
+                        <img src="{{ url_for('static', filename='images/map.png') }}" alt="Map" class="img-fluid rounded">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="faq-section">
+                    <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How do I create an account?
+                                </button>
+                            </h3>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="faqOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Creating an account is simple! Click on the "Register" button in the top right corner of the homepage. Fill in your details, verify your email address, and you're ready to start your journey to finding your soulmate.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Is my information secure?
+                                </button>
+                            </h3>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    We take privacy and security very seriously. Your personal information is encrypted and protected. You also have control over who can view your profile and what information is visible to others.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    How does the matching algorithm work?
+                                </button>
+                            </h3>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Our matching algorithm considers multiple factors including your preferences, interests, values, and life goals. It goes beyond basic demographics to find truly compatible matches. The more complete your profile, the better matches we can suggest!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 60px 0;
+        border-radius: 0 0 50% 50% / 20px;
+    }
+    
+    .contact-info, .contact-form {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        height: 100%;
+    }
+    
+    .contact-item {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .contact-item i {
+        font-size: 24px;
+        color: var(--primary-color);
+        margin-right: 20px;
+        margin-top: 5px;
+    }
+    
+    .contact-item h5 {
+        margin-bottom: 5px;
+        color: var(--primary-color);
+    }
+    
+    .social-icons a {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background-color: var(--light-pink);
+        border-radius: 50%;
+        text-align: center;
+        line-height: 40px;
+        margin-right: 10px;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+    
+    .social-icons a:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .map-container, .faq-section {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: var(--light-pink);
+        color: var(--primary-color);
+    }
+    
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(232, 62, 140, 0.25);
+    }
+</style>
+{% endblock %}
