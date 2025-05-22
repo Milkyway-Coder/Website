@@ -5,97 +5,453 @@
 {% block content %}
 <section class="profile-view-section py-5">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="profile-sidebar">
-                    <div class="profile-image">
-                        {% if profile.profile_pic %}
-                            <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" alt="{{ profile.full_name }}" class="img-fluid rounded">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Default Profile" class="img-fluid rounded">
-                        {% endif %}
+        <div class="row g-4">
+            <!-- Profile Sidebar -->
+            <div class="col-lg-4">
+                <div class="profile-sidebar card border-0 shadow-sm rounded-4 overflow-hidden sticky-lg-top" style="top: 2rem;">
+                    <div class="position-relative">
+                        <!-- Cover Photo -->
+                        <div class="profile-cover" style="height: 120px; background: linear-gradient(to right, var(--primary-color), #ff6b95);"></div>
+                        
+                        <!-- Profile Image -->
+                        <div class="profile-image-container text-center">
+                            <div class="profile-image-wrapper">
+                                {% if profile.profile_pic %}
+                                    <img src="{{ url_for('static', filename='uploads/' + profile.profile_pic) }}" 
+                                         alt="{{ profile.full_name }}" 
+                                         class="profile-image">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+                                         alt="Default Profile" 
+                                         class="profile-image">
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-center mt-3">{{ profile.full_name }}</h3>
-                    <p class="text-center text-muted">{{ profile.location }}</p>
                     
-                    <div class="profile-actions mt-4">
-                        <a href="{{ url_for('send_message', recipient_id=profile.user_id) }}" class="btn btn-primary btn-sm d-block mb-2">
-                            <i class="fas fa-envelope me-1"></i> Send Message
-                        </a>
-                        <a href="#" class="btn btn-outline-primary btn-sm d-block mb-2">
-                            <i class="fas fa-heart me-1"></i> Express Interest
-                        </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm d-block">
-                            <i class="fas fa-bookmark me-1"></i> Save Profile
-                        </a>
+                    <div class="card-body text-center pt-2 pb-4">
+                        <div class="mb-3">
+                            <h3 class="profile-name mb-1">{{ profile.full_name }}</h3>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i> {{ profile.location }}
+                            </p>
+                            <div class="profile-verification d-inline-block">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> Verified
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="quick-stats d-flex justify-content-center mb-4">
+                            <div class="stat-item px-3">
+                                <div class="stat-value">{{ ((now - profile.dob).days / 365)|int }}</div>
+                                <div class="stat-label">Age</div>
+                            </div>
+                            <div class="stat-item px-3 border-start border-end">
+                                <div class="stat-value">{{ profile.height }}</div>
+                                <div class="stat-label">cm</div>
+                            </div>
+                            <div class="stat-item px-3">
+                                <div class="stat-value">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="stat-label">{{ profile.education.split()[-1] if profile.education else 'Ed' }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Actions -->
+                        <div class="profile-actions">
+                            {% if user.id != profile.user_id %}
+                                <div class="d-grid gap-2 mb-3">
+                                    <a href="{{ url_for('send_message', recipient_id=profile.user_id) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-comment-dots me-2"></i> Send Message
+                                    </a>
+                                    
+                                    {% if interest_status is none %}
+                                        <a href="{{ url_for('express_interest', recipient_id=profile.user_id) }}" 
+                                           class="btn btn-outline-danger pulse-button">
+                                            <i class="fas fa-heart me-2"></i> Express Interest
+                                        </a>
+                                    {% elif interest_status == 'pending' %}
+                                        <button class="btn btn-outline-warning" disabled>
+                                            <i class="fas fa-clock me-2"></i> Interest Pending
+                                        </button>
+                                    {% elif interest_status == 'accepted' %}
+                                        <button class="btn btn-outline-success" disabled>
+                                            <i class="fas fa-check-circle me-2"></i> Interest Accepted
+                                        </button>
+                                    {% elif interest_status == 'declined' %}
+                                        <button class="btn btn-outline-secondary" disabled>
+                                            <i class="fas fa-times-circle me-2"></i> Interest Declined
+                                        </button>
+                                    {% endif %}
+                                </div>
+                                
+
+                                <div class="d-flex justify-content-between">
+                                    <form action="{{ url_for('save_profile', profile_id=profile.user_id) }}" method="POST" class="flex-grow-1 me-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            {% if is_saved %}
+                                                <i class="fas fa-bookmark-slash me-1"></i> Unsave
+                                            {% else %}
+                                                <i class="fas fa-bookmark me-1"></i> Save
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-sm btn-outline-secondary flex-grow-1">
+                                        <i class="fas fa-share-alt me-1"></i> Share
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary flex-grow-1 ms-2">
+                                        <i class="fas fa-flag me-1"></i> Report
+                                    </button>
+                                </div>
+                            {% else %}
+                                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-2"></i> Edit Profile
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
+            
+            <!-- Profile Content -->
+            <div class="col-lg-8">
                 <div class="profile-content">
-                    <div class="profile-header">
-                        <h2>About {{ profile.full_name.split()[0] }}</h2>
-                        <div class="profile-stats">
-                            <div class="stat">
-                                <span class="label">Age</span>
-                                <span class="value">{{ ((now - profile.dob).days / 365)|int }}</span>
+                    <!-- About Me Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <div class="section-title d-flex align-items-center mb-3">
+                                <div class="icon-circle me-3">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <h4 class="m-0">About {{ profile.full_name.split()[0] }}</h4>
                             </div>
-                            <div class="stat">
-                                <span class="label">Height</span>
-                                <span class="value">{{ profile.height }} cm</span>
+                            <p class="mb-0">{{ profile.about }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Details Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <div class="section-title d-flex align-items-center mb-3">
+                                <div class="icon-circle me-3">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <h4 class="m-0">Personal Details</h4>
                             </div>
-                            <div class="stat">
-                                <span class="label">Religion</span>
-                                <span class="value">{{ profile.religion }}</span>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Full Name</div>
+                                            <div class="detail-value">{{ profile.full_name }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-venus-mars"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Gender</div>
+                                            <div class="detail-value">{{ profile.gender }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-birthday-cake"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Age</div>
+                                            <div class="detail-value">{{ ((now - profile.dob).days / 365)|int }} years</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-ruler-vertical"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Height</div>
+                                            <div class="detail-value">{{ profile.height }} cm</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-pray"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Religion</div>
+                                            <div class="detail-value">{{ profile.religion }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Caste</div>
+                                            <div class="detail-value">{{ profile.caste or 'Not specified' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="profile-section">
-                        <h4><i class="fas fa-user me-2"></i> Personal Information</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Full Name:</strong> {{ profile.full_name }}</p>
-                                <p><strong>Gender:</strong> {{ profile.gender }}</p>
-                                <p><strong>Age:</strong> {{ ((now - profile.dob).days / 365)|int }} years</p>
+                    <!-- Education & Career Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <div class="section-title d-flex align-items-center mb-3">
+                                <div class="icon-circle me-3">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h4 class="m-0">Education & Career</h4>
                             </div>
-                            <div class="col-md-6">
-                                <p><strong>Religion:</strong> {{ profile.religion }}</p>
-                                <p><strong>Caste:</strong> {{ profile.caste or 'Not specified' }}</p>
-                                <p><strong>Location:</strong> {{ profile.location }}</p>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-university"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Education</div>
+                                            <div class="detail-value">{{ profile.education }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="detail-item d-flex">
+                                        <div class="detail-icon me-3">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <div class="detail-content">
+                                            <div class="detail-label">Profession</div>
+                                            <div class="detail-value">{{ profile.profession }}</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="profile-section">
-                        <h4><i class="fas fa-graduation-cap me-2"></i> Education & Career</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Education:</strong> {{ profile.education }}</p>
+                    <!-- Interests & Hobbies Card -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-body p-4">
+                            <div class="section-title d-flex align-items-center mb-3">
+                                <div class="icon-circle me-3">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <h4 class="m-0">Interests & Hobbies</h4>
                             </div>
-                            <div class="col-md-6">
-                                <p><strong>Profession:</strong> {{ profile.profession }}</p>
-                            </div>
+                            
+                            <p class="mb-0">{{ profile.interests }}</p>
+                            
+                            {% if profile.interests and ',' in profile.interests %}
+                                <div class="interest-tags mt-3">
+                                    {% for interest in profile.interests.split(',') %}
+                                        <span class="interest-tag">{{ interest.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     
-                    <div class="profile-section">
-                        <h4><i class="fas fa-heart me-2"></i> About Me</h4>
-                        <p>{{ profile.about }}</p>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h4><i class="fas fa-star me-2"></i> Interests & Hobbies</h4>
-                        <p>{{ profile.interests }}</p>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h4><i class="fas fa-search me-2"></i> Partner Preferences</h4>
-                        <p>{{ profile.partner_preferences }}</p>
+                    <!-- Partner Preferences Card -->
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <div class="section-title d-flex align-items-center mb-3">
+                                <div class="icon-circle me-3">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h4 class="m-0">Partner Preferences</h4>
+                            </div>
+                            
+                            <p class="mb-0">{{ profile.partner_preferences }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<style>
+    /* Custom Profile View Styles */
+    .profile-view-section {
+        background-color: #f8f9fa;
+    }
+    
+    /* Profile Sidebar */
+    .profile-image-container {
+        margin-top: -50px;
+        position: relative;
+    }
+    
+    .profile-image-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-name {
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+        padding: 10px 0;
+        background-color: rgba(var(--primary-rgb), 0.03);
+        border-radius: 10px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Profile Content */
+    .section-title {
+        font-weight: 600;
+    }
+    
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), #ff6b95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    /* Detail Items */
+    .detail-item {
+        margin-bottom: 15px;
+    }
+    
+    .detail-icon {
+        width: 35px;
+        height: 35px;
+        background-color: rgba(var(--primary-rgb), 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+        font-weight: 500;
+    }
+    
+    /* Interest Tags */
+    .interest-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .interest-tag {
+        background-color: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        font-size: 0.875rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    
+    /* Button Styles */
+    .pulse-button {
+        position: relative;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(var(--danger-rgb), 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(var(--danger-rgb), 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(var(--danger-rgb), 0);
+        }
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .sticky-lg-top {
+            position: static !important;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .profile-image-wrapper {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .profile-name {
+            font-size: 1.3rem;
+        }
+    }
+</style>
 {% endblock %}

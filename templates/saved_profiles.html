@@ -1,0 +1,835 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Profiles - SoulMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Common Dashboard Styles */
+    :root {
+        --primary-color: #FF4B91;
+        --primary-light: #FFD0E0;
+        --secondary-color: #2D3748;
+        --accent-color: #6B46C1;
+        --success-color: #38A169;
+        --warning-color: #F6AD55;
+        --danger-color: #E53E3E;
+        --background-color: #F7FAFC;
+        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --transition: all 0.3s ease;
+    }
+    
+    body {
+        background-color: var(--background-color);
+    }
+    
+    .dashboard-section {
+        padding: 40px 0;
+    }
+    
+    /* Profile Sidebar */
+    .profile-sidebar {
+        background: white;
+        border-radius: 20px;
+        padding: 30px 20px;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        z-index: 0;
+    }
+    
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        margin: 15px auto 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .profile-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border: 4px solid white;
+        border-radius: 50%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-details {
+        margin-top: 20px;
+    }
+    
+    .profile-details h4 {
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--secondary-color);
+    }
+    
+    .profile-details p {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+    
+    .profile-actions {
+        margin: 25px 0 15px;
+    }
+    
+    .profile-actions .btn {
+        border-radius: 50px;
+        padding: 8px 15px;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: var(--transition);
+    }
+    
+    .profile-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-actions .btn i {
+        margin-right: 8px;
+    }
+    
+    /* Dashboard Navigation */
+    .dashboard-nav {
+        margin-bottom: 30px;
+    }
+    
+    .dashboard-nav .list-group {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .dashboard-nav .list-group-item {
+        border: none;
+        padding: 12px 20px;
+        background-color: white;
+        color: var(--secondary-color);
+        font-weight: 500;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
+    }
+    
+    .dashboard-nav .list-group-item:hover {
+        background-color: #F9FAFB;
+        border-left: 3px solid var(--primary-light);
+    }
+    
+    .dashboard-nav .list-group-item.active {
+        background-color: #FFF5F8;
+        color: var(--primary-color);
+        border-left: 3px solid var(--primary-color);
+    }
+    
+    .dashboard-nav .list-group-item i {
+        margin-right: 12px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .badge {
+        padding: 5px 8px;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.7rem;
+    }
+    
+    /* Main Dashboard Content */
+    .dashboard-content {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .dashboard-content h2 {
+        font-weight: 700;
+        color: var(--secondary-color);
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #F0F4F8;
+    }
+    
+    .dashboard-content h2 i {
+        color: var(--primary-color);
+    }
+    
+    /* Filter and Search Section */
+    .filters-section {
+        background: #F8FAFC;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box input {
+        border-radius: 50px;
+        padding-left: 45px;
+        height: 48px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        transition: var(--transition);
+    }
+    
+    .search-box input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 75, 145, 0.2);
+    }
+    
+    .search-box .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #A0AEC0;
+    }
+    
+    .sort-options .btn-group {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-radius: 50px;
+        overflow: hidden;
+    }
+    
+    .sort-options .btn {
+        border-radius: 0;
+        font-size: 0.85rem;
+        padding: 12px 15px;
+        border: none;
+        background-color: white;
+        color: #718096;
+        font-weight: 500;
+    }
+    
+    .sort-options .btn:first-child {
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+    }
+    
+    .sort-options .btn:last-child {
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+    }
+    
+    .sort-options .btn.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Saved Profile Cards */
+    .saved-profiles-container {
+        margin: 0 -10px;
+    }
+    
+    .profile-card-wrapper {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .saved-profile-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: var(--transition);
+        height: 100%;
+        position: relative;
+        border: 1px solid #F0F4F8;
+    }
+    
+    .saved-profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .profile-image-container {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+    
+    .saved-profile-card img.profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .saved-profile-card:hover img.profile-image {
+        transform: scale(1.05);
+    }
+    
+    .profile-info {
+        padding: 25px;
+        position: relative;
+    }
+    
+    .profile-info h4 {
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--secondary-color);
+    }
+    
+    .profile-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    
+    .profile-meta-item {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+        color: #718096;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+    
+    .profile-meta-item i {
+        margin-right: 8px;
+        color: var(--primary-color);
+        font-size: 0.9rem;
+    }
+    
+    /* Profile Card Badges and Actions */
+    .saved-date {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        backdrop-filter: blur(5px);
+        z-index: 2;
+    }
+    
+    .remove-saved {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: white;
+        color: var(--primary-color);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        z-index: 2;
+    }
+    
+    .remove-saved:hover {
+        background: var(--danger-color);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .interest-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        z-index: 2;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .interest-badge.pending {
+        background-color: var(--warning-color);
+        color: #744210;
+    }
+    
+    .interest-badge.accepted {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .interest-badge.declined {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .interest-badge i {
+        margin-right: 5px;
+    }
+    
+    .profile-actions-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-profile-action {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    .btn-profile-action:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-profile-action i {
+        margin-right: 8px;
+    }
+    
+    .btn-view-profile {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    
+    .btn-view-profile:hover {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    
+    .btn-express-interest {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-express-interest:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-message {
+        color: #3182CE;
+        border-color: #3182CE;
+    }
+    
+    .btn-message:hover {
+        background-color: #3182CE;
+        color: white;
+    }
+    
+    /* Notes Form */
+    .notes-form {
+        background-color: #F8FAFC;
+        padding: 15px;
+        border-radius: 12px;
+        margin-top: 10px;
+    }
+    
+    .notes-form textarea {
+        border-radius: 12px;
+        resize: none;
+        font-size: 0.85rem;
+        border: 1px solid #E2E8F0;
+        padding: 12px;
+        background-color: white;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        transition: var(--transition);
+    }
+    
+    .notes-form textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 75, 145, 0.1);
+    }
+    
+    .notes-form button {
+        border-radius: 50px;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: var(--transition);
+    }
+    
+    .notes-form button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(to bottom, #F8FAFC, white);
+        border-radius: 20px;
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        color: #CBD5E0;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+    
+    .empty-state h4 {
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--secondary-color);
+    }
+    
+    .empty-state p {
+        color: #718096;
+        margin-bottom: 25px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .empty-state .btn {
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-weight: 500;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: var(--transition);
+    }
+    
+    .empty-state .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 991px) {
+        .profile-sidebar, .dashboard-nav {
+            margin-bottom: 30px;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .dashboard-section {
+            padding: 20px 0;
+        }
+        
+        .dashboard-content {
+            padding: 20px;
+        }
+        
+        .sort-options {
+            margin-top: 15px;
+        }
+        
+        .sort-options .btn {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .profile-card-wrapper {
+            margin-bottom: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3">
+                <div class="profile-sidebar">
+                    <div class="profile-image">
+                        {% if user.profile and user.profile.profile_pic %}
+                            <img src="{{ url_for('static', filename='uploads/' + user.profile.profile_pic) }}" alt="Profile Picture">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Default Profile">
+                        {% endif %}
+                    </div>
+                    <div class="profile-details">
+                        <h4>{{ user.username }}</h4>
+                        {% if user.profile %}
+                            <p><i class="fas fa-map-marker-alt text-primary me-1"></i> {{ user.profile.location }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="profile-actions">
+                        {% if user.profile %}
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-user-edit"></i> Edit Profile
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('create_profile') }}" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-user-plus"></i> Create Profile
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('messages') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-envelope"></i> Messages
+                            {% if unread_messages > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+                <div class="dashboard-nav">
+                    <div class="list-group">
+                        <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-th-large"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('search') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-search"></i> Search Profiles
+                        </a>                        
+                        <a href="{{ url_for('messages') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-envelope"></i> Messages
+                            {% if unread_messages > 0 %}
+                                <span class="badge bg-danger rounded-pill float-end">{{ unread_messages }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="{{ url_for('interests') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-heart"></i> Interests
+                            {% if received_pending_interests_count > 0 %}
+                                <span class="badge bg-danger rounded-pill float-end">{{ received_pending_interests_count }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="{{ url_for('saved_profiles') }}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-bookmark"></i> Saved Profiles
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="dashboard-content">
+                    <h2><i class="fas fa-bookmark me-2"></i>Saved Profiles</h2>
+                    
+                    <!-- Filter and Search Section -->
+                    <div class="filters-section">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="form-control" id="searchSaved" placeholder="Search by name, location or notes...">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="sort-options text-md-end">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn active" data-sort="recent">
+                                            <i class="fas fa-clock me-1"></i> Recent
+                                        </button>
+                                        <button type="button" class="btn" data-sort="name">
+                                            <i class="fas fa-sort-alpha-down me-1"></i> Name
+                                        </button>
+                                        <button type="button" class="btn" data-sort="interests">
+                                            <i class="fas fa-heart me-1"></i> Interests
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Saved Profiles List -->
+                    {% if saved_data %}
+                        <div class="row saved-profiles-container">
+                            {% for item in saved_data %}
+                                <div class="col-md-6 col-lg-4 profile-card-wrapper">
+                                    <div class="saved-profile-card">
+                                        <div class="profile-image-container">
+                                            {% if item.interest_status %}
+                                                <div class="interest-badge 
+                                                    {% if item.interest_status == 'pending' %}pending{% elif item.interest_status == 'accepted' %}accepted{% else %}declined{% endif %}">
+                                                    {% if item.interest_status == 'pending' %}
+                                                        <i class="fas fa-clock"></i> Interest Pending
+                                                    {% elif item.interest_status == 'accepted' %}
+                                                        <i class="fas fa-check-circle"></i> Interest Accepted
+                                                    {% else %}
+                                                        <i class="fas fa-times-circle"></i> Interest Declined
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if item.profile.profile_pic %}
+                                                <img src="{{ url_for('static', filename='uploads/' + item.profile.profile_pic) }}" 
+                                                    alt="{{ item.profile.full_name }}" class="profile-image">
+                                            {% else %}
+                                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+                                                    alt="Default Profile" class="profile-image">
+                                            {% endif %}
+                                            
+                                            <div class="saved-date">
+                                                <i class="fas fa-calendar-alt me-1"></i> 
+                                                {{ item.saved_record.timestamp.strftime('%d %b %Y') }}
+                                            </div>
+                                            
+                                            <form action="{{ url_for('save_profile', profile_id=item.user.id) }}" method="post" class="d-inline">
+                                                <button type="submit" class="remove-saved border-0" title="Remove from saved">
+                                                    <i class="fas fa-bookmark"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        
+                                        <div class="profile-info">
+                                            <h4>{{ item.profile.full_name }}</h4>
+                                            
+                                            <div class="profile-meta">
+                                                <div class="profile-meta-item">
+                                                    <i class="fas fa-birthday-cake"></i>
+                                                    {{ ((now - item.profile.dob).days / 365)|int }} yrs
+                                                </div>
+                                                <div class="profile-meta-item">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    {{ item.profile.location }}
+                                                </div>
+                                                <div class="profile-meta-item">
+                                                    <i class="fas fa-briefcase"></i>
+                                                    {{ item.profile.profession }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="profile-actions-container">
+                                                <a href="{{ url_for('view_profile', user_id=item.user.id) }}" 
+                                                    class="btn btn-sm btn-outline-primary btn-profile-action btn-view-profile">
+                                                    <i class="fas fa-user"></i> View Profile
+                                                </a>
+                                                
+                                                {% if not item.interest_status %}
+                                                    <a href="{{ url_for('express_interest', recipient_id=item.user.id) }}" 
+                                                        class="btn btn-sm btn-outline-danger btn-profile-action btn-express-interest">
+                                                        <i class="fas fa-heart"></i> Express Interest
+                                                    </a>
+                                                {% endif %}
+                                                
+                                                <a href="{{ url_for('send_message', recipient_id=item.user.id) }}" 
+                                                    class="btn btn-sm btn-outline-info btn-profile-action btn-message">
+                                                    <i class="fas fa-comment"></i> Message
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="notes-form">
+                                                <form action="{{ url_for('update_saved_notes', saved_id=item.saved_record.id) }}" method="post">
+                                                    <div class="form-group">
+                                                        <textarea class="form-control" name="notes" rows="2" 
+                                                            placeholder="Add personal notes about {{ item.profile.full_name.split()[0] }}...">{{ item.saved_record.notes }}</textarea>
+                                                    </div>
+                                                    <div class="text-end mt-2">
+                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-save me-1"></i> Save Notes
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="empty-state">
+                            <i class="fas fa-bookmark"></i>
+                            <h4>No Saved Profiles Yet</h4>
+                            <p>You haven't saved any profiles. When you find someone interesting, click the bookmark icon to save them here.</p>
+                            <a href="{{ url_for('search') }}" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i> Browse Profiles
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality 
+        const searchInput = document.getElementById('searchSaved');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                const profileCards = document.querySelectorAll('.saved-profile-card');
+                
+                profileCards.forEach(card => {
+                    const profileName = card.querySelector('h4').textContent.toLowerCase();
+                    const profileMeta = card.querySelector('.profile-meta').textContent.toLowerCase();
+                    const notes = card.querySelector('textarea').value.toLowerCase();
+                    
+                    if (profileName.includes(searchText) || 
+                        profileMeta.includes(searchText) || 
+                        notes.includes(searchText)) {
+                        card.closest('.profile-card-wrapper').style.display = '';
+                    } else {
+                        card.closest('.profile-card-wrapper').style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Sort functionality
+        const sortButtons = document.querySelectorAll('[data-sort]');
+        sortButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active state
+                document.querySelector('.sort-options .btn.active').classList.remove('active');
+                this.classList.add('active');
+                
+                const sortType = this.getAttribute('data-sort');
+                const profilesContainer = document.querySelector('.saved-profiles-container');
+                const profileCards = Array.from(profilesContainer.querySelectorAll('.profile-card-wrapper'));
+                
+                // Sort the cards based on selected criteria
+                profileCards.sort((a, b) => {
+                    if (sortType === 'recent') {
+                        const dateA = a.querySelector('.saved-date').textContent.trim();
+                        const dateB = b.querySelector('.saved-date').textContent.trim();
+                        return dateB.localeCompare(dateA); // Recent first
+                    } else if (sortType === 'name') {
+                        const nameA = a.querySelector('h4').textContent.trim();
+                        const nameB = b.querySelector('h4').textContent.trim();
+                        return nameA.localeCompare(nameB);
+                    } else if (sortType === 'interests') {
+                        // Sort by interest status - accepted first, then pending, then no interest
+                        const hasInterestBadgeA = a.querySelector('.interest-badge');
+                        const hasInterestBadgeB = b.querySelector('.interest-badge');
+                        
+                        if (hasInterestBadgeA && !hasInterestBadgeB) return -1;
+                        if (!hasInterestBadgeA && hasInterestBadgeB) return 1;
+                        
+                        if (hasInterestBadgeA && hasInterestBadgeB) {
+                            if (hasInterestBadgeA.classList.contains('accepted') && !hasInterestBadgeB.classList.contains('accepted')) return -1;
+                            if (!hasInterestBadgeA.classList.contains('accepted') && hasInterestBadgeB.classList.contains('accepted')) return 1;
+                            if (hasInterestBadgeA.classList.contains('pending') && !hasInterestBadgeB.classList.contains('pending')) return -1;
+                            if (!hasInterestBadgeA.classList.contains('pending') && hasInterestBadgeB.classList.contains('pending')) return 1;
+                        }
+                        
+                        return 0;
+                    }
+                });
+                
+                // Remove existing cards and append in sorted order
+                profileCards.forEach(card => profilesContainer.appendChild(card));
+            });
+        });
+    });
+</script>
+{% endblock %}

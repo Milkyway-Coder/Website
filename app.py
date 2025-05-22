@@ -25,6 +25,15 @@ class User(db.Model):
     sent_messages = db.relationship('Message', backref='sender', foreign_keys='Message.sender_id')
     received_messages = db.relationship('Message', backref='recipient', foreign_keys='Message.recipient_id')
 
+    def get_profile_views_count(self):
+        return ProfileView.query.filter_by(viewed_id=self.id).count()
+    
+    def get_interests_received_count(self):
+        return Interest.query.filter_by(recipient_id=self.id).count()
+    
+    def get_pending_interests_received_count(self):
+        return Interest.query.filter_by(recipient_id=self.id, status='pending').count()    
+
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -49,6 +58,43 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     is_read = db.Column(db.Boolean, default=False)
+
+class Interest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, declined
+    
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_interests')
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_interests')
+
+class ProfileView(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    viewer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    viewed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    viewer = db.relationship('User', foreign_keys=[viewer_id], backref='profile_views')
+    viewed = db.relationship('User', foreign_keys=[viewed_id], backref='profile_viewers')
+
+
+class SavedProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    saved_profile_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    notes = db.Column(db.Text)
+    
+    # Define relationships
+    saver = db.relationship('User', foreign_keys=[user_id], backref='saved_profiles')
+    saved = db.relationship('User', foreign_keys=[saved_profile_id], backref='saved_by')
+    
+    # Add a unique constraint to prevent duplicate saves
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'saved_profile_id', name='unique_saved_profile'),
+    )
+
 
 # Routes
 @app.route('/')
@@ -111,10 +157,33 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    unread_messages = Message.query.filter_by(recipient_id=user.id, is_read=False).count()
+    user_id = session['user_id']
+    user = User.query.get(user_id)
     
-    return render_template('dashboard.html', user=user, unread_messages=unread_messages)
+    # Get profile view count
+    profile_views_count = ProfileView.query.filter_by(viewed_id=user_id).count()
+    
+    # Get interest counts
+    interests_received_count = Interest.query.filter_by(recipient_id=user_id).count()
+    
+    # Get unread message count
+    unread_messages = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
+
+    # Get received pending interests count (assuming you have a status field)
+    received_pending_interests_count = Interest.query.filter_by(recipient_id=user_id, status='pending').count()
+
+    # Get saved profiles count - Add this line
+    saved_profiles_count = SavedProfile.query.filter_by(user_id=user_id).count()
+    
+    return render_template(
+        'dashboard.html', 
+        user=user, 
+        unread_messages=unread_messages, 
+        profile_views_count=profile_views_count,
+        interests_received_count=interests_received_count,
+        received_pending_interests_count=received_pending_interests_count,
+        saved_profiles_count=saved_profiles_count
+    )
 
 @app.route('/create_profile', methods=['GET', 'POST'])
 def create_profile():
@@ -254,9 +323,39 @@ def view_profile(user_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
+    # Retrieve the current user
+    current_user_id = session['user_id']
+    user = User.query.get(current_user_id)  # Get the current user from the database
+    
+    # Don't track if viewing own profile
+    if current_user_id != user_id:
+        # Record profile view
+        new_view = ProfileView(
+            viewer_id=current_user_id,
+            viewed_id=user_id
+        )
+        db.session.add(new_view)
+        db.session.commit()
+    
     profile = Profile.query.filter_by(user_id=user_id).first_or_404()
     
-    return render_template('view_profile.html', profile=profile,now=now)
+    # Check if current user has sent an interest to this profile
+    interest_status = None
+    if current_user_id != user_id:
+        interest = Interest.query.filter_by(
+            sender_id=current_user_id, 
+            recipient_id=user_id
+        ).first()
+        if interest:
+            interest_status = interest.status
+
+    # Check if profile is already saved by current user
+    is_saved = SavedProfile.query.filter_by(
+        user_id=current_user_id,
+        saved_profile_id=user_id
+    ).first() is not None
+    
+    return render_template('view_profile.html', user=user, profile=profile, now=now, interest_status=interest_status, is_saved=is_saved)
 
 @app.route('/messages')
 def messages():
@@ -311,6 +410,219 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+@app.route('/express_interest/<int:recipient_id>')
+def express_interest(recipient_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Check if interest already exists
+    existing_interest = Interest.query.filter_by(
+        sender_id=session['user_id'], 
+        recipient_id=recipient_id
+    ).first()
+    
+    if existing_interest:
+        flash('You have already expressed interest in this profile.')
+        return redirect(url_for('view_profile', user_id=recipient_id))
+    
+    # Create new interest
+    new_interest = Interest(
+        sender_id=session['user_id'],
+        recipient_id=recipient_id
+    )
+    
+    db.session.add(new_interest)
+    db.session.commit()
+    
+    flash('Interest expressed successfully!')
+    return redirect(url_for('view_profile', user_id=recipient_id))
+
+@app.route('/browse_matches')
+def browse_matches():
+    # Logic for browsing matches
+    return render_template('search.html')
+
+@app.route('/interests')
+def interests():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    received_interests = Interest.query.filter_by(recipient_id=user_id).order_by(Interest.timestamp.desc()).all()
+    sent_interests = Interest.query.filter_by(sender_id=user_id).order_by(Interest.timestamp.desc()).all()
+    
+    return render_template('interests.html', received_interests=received_interests, sent_interests=sent_interests)
+
+@app.route('/respond_interest/<int:interest_id>/<string:response>')
+def respond_interest(interest_id, response):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    interest = Interest.query.get_or_404(interest_id)
+    
+    # Ensure the user is the recipient of the interest
+    if interest.recipient_id != session['user_id']:
+        flash('Unauthorized action.')
+        return redirect(url_for('interests'))
+    
+    if response == 'accept':
+        interest.status = 'accepted'
+        flash('Interest accepted!')
+    elif response == 'decline':
+        interest.status = 'declined'
+        flash('Interest declined.')
+    elif response == 'change':
+        # Show a page to change the response
+        return render_template('change_response.html', interest=interest)
+    
+    db.session.commit()
+    return redirect(url_for('interests'))
+
+@app.route('/update_interest_response/<int:interest_id>', methods=['POST'])
+def update_interest_response(interest_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    interest = Interest.query.get_or_404(interest_id)
+    
+    # Ensure the user is the recipient of the interest
+    if interest.recipient_id != session['user_id']:
+        flash('Unauthorized action.')
+        return redirect(url_for('interests'))
+    
+    # Get the new status from the form
+    new_status = request.form.get('status')
+    
+    # Update the status
+    if new_status in ['accepted', 'declined']:
+        old_status = interest.status  # Store the old status for flash message
+        interest.status = new_status
+        
+        if old_status == new_status:
+            flash(f'No changes made. The interest remains {new_status}.')
+        else:
+            flash(f'Your response has been updated from {old_status} to {new_status}!')
+            
+        db.session.commit()
+    else:
+        flash('Invalid status.')
+    
+    return redirect(url_for('interests'))
+
+
+# Add these routes to your Flask app
+
+# Save or unsave a profile
+@app.route('/save_profile/<int:profile_id>', methods=['POST'])
+def save_profile(profile_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    # Check if already saved
+    existing_save = SavedProfile.query.filter_by(
+        user_id=user_id,
+        saved_profile_id=profile_id
+    ).first()
+    
+    if existing_save:
+        # Unsave the profile
+        db.session.delete(existing_save)
+        db.session.commit()
+        flash('Profile removed from favorites!', 'success')
+    else:
+        # Save the profile
+        new_save = SavedProfile(
+            user_id=user_id,
+            saved_profile_id=profile_id,
+            notes=""
+        )
+        db.session.add(new_save)
+        db.session.commit()
+        flash('Profile added to favorites!', 'success')
+    
+    # Get the URL to return to
+    next_page = request.args.get('next') or request.referrer or url_for('dashboard')
+    return redirect(next_page)
+
+# View saved profiles
+@app.route('/saved_profiles')
+def saved_profiles():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    now = datetime.now().date()
+    
+    # Get saved profiles with their user and profile data
+    saved = db.session.query(
+        SavedProfile, User, Profile
+    ).join(
+        User, User.id == SavedProfile.saved_profile_id
+    ).join(
+        Profile, Profile.user_id == SavedProfile.saved_profile_id
+    ).filter(
+        SavedProfile.user_id == user_id
+    ).order_by(
+        SavedProfile.timestamp.desc()
+    ).all()
+    
+    # Check interests status for each saved profile
+    saved_data = []
+    for saved_record, saved_user, saved_profile in saved:
+        # Check if user has sent an interest to this profile
+        interest = Interest.query.filter_by(
+            sender_id=user_id,
+            recipient_id=saved_user.id
+        ).first()
+        
+        interest_status = interest.status if interest else None
+        
+        saved_data.append({
+            'saved_record': saved_record,
+            'user': saved_user,
+            'profile': saved_profile,
+            'interest_status': interest_status
+        })
+    
+    # Get counts for the sidebar
+    unread_messages = Message.query.filter_by(recipient_id=user_id, is_read=False).count()
+    received_pending_interests_count = Interest.query.filter_by(recipient_id=user_id, status='pending').count()
+    
+    return render_template(
+        'saved_profiles.html',
+        user=user,
+        saved_data=saved_data,
+        now=now,
+        unread_messages=unread_messages,
+        received_pending_interests_count=received_pending_interests_count
+    )
+
+# Update saved profile notes
+@app.route('/update_saved_notes/<int:saved_id>', methods=['POST'])
+def update_saved_notes(saved_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']
+    
+    saved = SavedProfile.query.get_or_404(saved_id)
+    
+    # Ensure the user owns this saved profile
+    if saved.user_id != user_id:
+        flash('Unauthorized action.')
+        return redirect(url_for('saved_profiles'))
+    
+    notes = request.form.get('notes', '')
+    saved.notes = notes
+    db.session.commit()
+    
+    flash('Notes updated successfully!', 'success')
+    return redirect(url_for('saved_profiles'))
+
 
 if __name__ == '__main__':
     with app.app_context():

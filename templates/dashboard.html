@@ -63,7 +63,7 @@
         background: white;
         border-radius: 15px;
         padding: 30px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        box-shadow: 0 5px 20px rgba(255, 75, 145, 0.4); /* previous value - rgba(0, 0, 0, 0.05) */
     }
     
     .alert-profile {
@@ -251,8 +251,17 @@
                                 <span class="badge bg-danger rounded-pill float-end">{{ unread_messages }}</span>
                             {% endif %}
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('interests') }}" class="list-group-item list-group-item-action">
                             <i class="fas fa-heart"></i> Interests
+                            {% if received_pending_interests_count > 0 %}
+                                <span class="badge bg-danger rounded-pill float-end">{{ received_pending_interests_count }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="{{ url_for('saved_profiles') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-bookmark"></i> Saved Profiles
+                            {% if saved_profiles_count > 0 %}
+                                <span class="badge bg-danger rounded-pill float-end">{{ saved_profiles_count }}</span>
+                            {% endif %}
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-cog"></i> Settings
@@ -287,7 +296,7 @@
                                     <i class="fas fa-eye"></i>
                                 </div>
                                 <div class="stat-info">
-                                    <h3>24</h3>
+                                    <h3>{{ profile_views_count }}</h3>
                                     <p>Profile Views</p>
                                 </div>
                             </div>
@@ -298,7 +307,7 @@
                                     <i class="fas fa-heart"></i>
                                 </div>
                                 <div class="stat-info">
-                                    <h3>12</h3>
+                                    <h3>{{ interests_received_count }}</h3>
                                     <p>Interests Received</p>
                                 </div>
                             </div>

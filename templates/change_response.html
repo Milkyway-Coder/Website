@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Change Response - SoulMate{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-header bg-white text-center border-0 pt-4">
+                        <h3 class="text-gradient mb-0">Change Your Response</h3>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <div class="d-inline-block position-relative">
+                                {% if interest.sender.profile and interest.sender.profile.profile_pic %}
+                                    <img src="{{ url_for('static', filename='uploads/' + interest.sender.profile.profile_pic) }}" 
+                                        alt="Profile" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+                                        alt="Default Profile" class="rounded-circle" width="80" height="80">
+                                {% endif %}
+                                <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-1 border border-white"></span>
+                            </div>
+                            <h4 class="mt-3 mb-1">{{ interest.sender.username }}</h4>
+                            {% if interest.sender.profile %}
+                                <p class="text-muted mb-0">{{ interest.sender.profile.location }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info mb-4">
+                            <p class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                You previously <strong>{{ interest.status }}</strong> this interest. Please select your new response below.
+                            </p>
+                        </div>
+                        
+                        <form action="{{ url_for('update_interest_response', interest_id=interest.id) }}" method="POST">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100 border-0">
+                                        <div class="card-body text-center p-4">
+                                            <div class="mb-3">
+                                                <i class="fas fa-check-circle fa-3x text-success"></i>
+                                            </div>
+                                            <h5 class="mb-3">Accept Interest</h5>
+                                            <p class="text-muted mb-4">Allow messaging and show interest in connecting</p>
+                                            <button type="submit" name="status" value="accepted" class="btn btn-success w-100">
+                                                <i class="fas fa-check me-2"></i> Accept
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100 border-0">
+                                        <div class="card-body text-center p-4">
+                                            <div class="mb-3">
+                                                <i class="fas fa-times-circle fa-3x text-secondary"></i>
+                                            </div>
+                                            <h5 class="mb-3">Decline Interest</h5>
+                                            <p class="text-muted mb-4">Politely decline this connection request</p>
+                                            <button type="submit" name="status" value="declined" class="btn btn-outline-secondary w-100">
+                                                <i class="fas fa-times me-2"></i> Decline
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <a href="{{ url_for('interests') }}" class="btn btn-link text-muted">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to Interests
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, var(--primary-color), #ff6b95);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
+{% endblock %}
